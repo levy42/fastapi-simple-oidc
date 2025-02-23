@@ -1,4 +1,4 @@
-# fastapi-oidc: OpenID Connect Plugin for FastAPI
+# OpenID Connect Plugin for FastAPI
 
 **fastapi-simple-oidc** is a simple, configurable plugin for enabling OpenID Connect (OIDC) authentication in a FastAPI application. It supports multiple identity providers, session management, and callbacks for handling login and logout events.
 
