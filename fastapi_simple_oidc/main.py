@@ -24,9 +24,9 @@ DEFAULT_PROVIDERS = {
     "IBM": "https://iam.cloud.ibm.com/identity"
 }
 DEFAULT_PROVIDERS_BY_NAME = {
-    k.upper(): v for k, v in DEFAULT_PROVIDERS.items()
+    k.lower(): v for k, v in DEFAULT_PROVIDERS.items()
 }
-PROVIDERS_DISPLAY_NAMES = {k.upper(): k for k in DEFAULT_PROVIDERS}
+PROVIDERS_DISPLAY_NAMES = {k.lower(): k for k in DEFAULT_PROVIDERS}
 
 
 class DiscoveryDocument(BaseModel):
@@ -157,7 +157,7 @@ class OIDC:
                     f"Provider {name} doesn't have a default auth URL, "
                     f"provide it with SSO_<PROVIDER>_URL"
                 )
-            sso_config.url = DEFAULT_PROVIDERS_BY_NAME[sso_config.name]
+            sso_config.url = DEFAULT_PROVIDERS_BY_NAME[name]
 
         if not sso_config.name:
             sso_config.name = PROVIDERS_DISPLAY_NAMES.get(

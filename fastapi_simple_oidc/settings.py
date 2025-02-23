@@ -3,10 +3,10 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class SSOConfig(BaseModel):
-    url: str
+    url: str | None = None
     id: str
     secret: str
-    name: str | None
+    name: str | None = None
 
 
 class Settings(BaseSettings):
