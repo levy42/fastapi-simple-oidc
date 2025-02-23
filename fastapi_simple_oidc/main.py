@@ -70,7 +70,9 @@ class OIDC:
                                           successful login. Defaults to '/'.
         """
         app.add_middleware(
-            SessionMiddleware, secret_key=secret_key, session_cookie="sso_session"
+            SessionMiddleware,
+            secret_key=secret_key,
+            session_cookie="sso_session"
         )
         self.providers = {}
         self.login_home_url = login_url
@@ -128,7 +130,7 @@ class OIDC:
         async def test(req: Request):
             try:
                 user = await get_logged_user(req)
-            except:
+            except Exception:
                 user = None
             logout_url = str(req.url).split('/.test')[0] + '/logout'
             return test_page(self._get_providers(req), user, logout_url)
@@ -139,14 +141,16 @@ class OIDC:
         return [
             SSOProvider(
                 name=provider,
-                display_name=discovery.display_name or prodiver,
+                display_name=discovery.display_name or provider,
                 url=str(req.url).rsplit('/', 1)[0] + f'/{provider}/login',
                 provider_url=discovery.authorization_endpoint,
             )
             for provider, discovery in self.providers.items()
         ]
 
-    def _configure_provider(self, name: str, sso_config: SSOConfig) -> DiscoveryDocument:
+    def _configure_provider(
+        self, name: str, sso_config: SSOConfig
+    ) -> DiscoveryDocument:
         if not sso_config.url:
             if name not in DEFAULT_PROVIDERS_BY_NAME:
                 raise ValueError(
@@ -156,7 +160,9 @@ class OIDC:
             sso_config.url = DEFAULT_PROVIDERS_BY_NAME[sso_config.name]
 
         if not sso_config.name:
-            sso_config.name = PROVIDERS_DISPLAY_NAMES.get(sso_config.name, name.capitalize())
+            sso_config.name = PROVIDERS_DISPLAY_NAMES.get(
+                sso_config.name, name.capitalize()
+            )
 
         discovery = get_openid_discovery(sso_config.url)
 
@@ -182,7 +188,7 @@ class OIDC:
 
         @router.get("/login")
         async def login(request: Request):
-            """Redirect user to the authorization URL of the Identity Provider"""
+            """Redirect user to the authorization URL of the ID Provider"""
             base_url = str(request.url).split(f"{provider}/")[0]
             return await getattr(oauth, provider).authorize_redirect(
                 request, base_url + f'{provider}/callback'
@@ -191,8 +197,16 @@ class OIDC:
         @router.get("/callback")
         async def callback(request: Request):
             """Handle callback from the identity provider"""
-            token = await getattr(oauth, provider).authorize_access_token(request)
-            user = await getattr(oauth, provider).get(discovery.userinfo_endpoint, token=token)
+
+            token = await getattr(
+                oauth, provider
+            ).authorize_access_token(request)
+
+            user = await getattr(
+                oauth, provider
+            ).get(
+                discovery.userinfo_endpoint, token=token
+            )
             user = user.json()
             request.session["user"] = user
 
