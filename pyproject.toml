@@ -2,6 +2,10 @@
 requires = ["setuptools>=42", "wheel"]
 build-backend = "setuptools.build_meta"
 
+[project.urls]
+Homepage = "https://github.com/levy42/fastapi-simple-oidc"
+Repository = "https://github.com/levy42/fastapi-simple-oidc"
+
 [project]
 name = "fastapi_simple_oidc"
 version = "0.0.1"
