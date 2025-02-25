@@ -8,7 +8,7 @@ Repository = "https://github.com/levy42/fastapi-simple-oidc"
 
 [project]
 name = "fastapi_simple_oidc"
-version = "0.0.1"
+version = "0.0.2"
 description = "OIDC for FastAPI"
 readme = "README.md"
 keywords = ["fastapi", "sso"]
