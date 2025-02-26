@@ -55,7 +55,7 @@ oauth = OAuth()
 
 
 class OIDC:
-    def __init__(self, app, secret_key, login_url: str = '/login', redirect_url: str = '/'):
+    def __init__(self, *, secret_key, app=None, login_url: str = '/login', redirect_url: str = '/'):
         """Initializes the OIDC authentication handler for a FastAPI application.
 
         This constructor sets up authentication using OpenID Connect (OIDC) with
@@ -69,11 +69,6 @@ class OIDC:
             redirect_url (str, optional): The URL to redirect users to after a
                                           successful login. Defaults to '/'.
         """
-        app.add_middleware(
-            SessionMiddleware,
-            secret_key=secret_key,
-            session_cookie="sso_session"
-        )
         self.providers = {}
         self.login_home_url = login_url
         self.redirect_url = redirect_url
@@ -81,8 +76,18 @@ class OIDC:
         self._configure_providers()
         self.router = self._configure_router()
 
+        self._secret_key = secret_key
+        if app:
+            self.configure_app(app)
         self._on_login: Callable | None = None
         self._on_logout: Callable | None = None
+
+    def configure_app(self, app):
+        app.add_middleware(
+            SessionMiddleware,
+            secret_key=self._secret_key,
+            session_cookie="sso_session"
+        )
 
     def on_login(self, f):
         """On login event decorator"""
@@ -112,7 +117,7 @@ class OIDC:
             """Logout user by clearing the session"""
             user = request.session.pop("user", None)
             if self._on_logout and user:
-                self._on_logout(OpenID(**user))
+                await self._on_logout(OpenID(**user))
 
             return RedirectResponse(url=self.login_home_url)
 
@@ -211,7 +216,7 @@ class OIDC:
             request.session["user"] = user
 
             if self._on_login:
-                self._on_login(OpenID(**user))
+                await self._on_login(OpenID(**user))
 
             return RedirectResponse(url=self.redirect_url)
 
