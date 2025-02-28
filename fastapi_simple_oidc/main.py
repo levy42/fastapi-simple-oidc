@@ -213,6 +213,7 @@ class OIDC:
                 discovery.userinfo_endpoint, token=token
             )
             user = user.json()
+            user['provider'] = provider
             request.session["user"] = user
 
             if self._on_login:
